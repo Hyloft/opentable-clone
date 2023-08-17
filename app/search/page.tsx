@@ -1,4 +1,6 @@
-<main className="bg-gray-100 min-h-screen w-screen">
+export default function Search() {
+  return(
+    <main className="bg-gray-100 min-h-screen w-screen">
   <main className="max-w-screen-2xl m-auto bg-white">
     {/* NAVBAR */}
     <nav className="bg-white p-2 flex justify-between">
@@ -12,7 +14,7 @@
           >
             Sign in
           </button>
-          <button className="border p-1 px-4 rounded">Sign up</button>
+          <button className="border text-black p-1 px-4 rounded">Sign up</button>
         </div>
       </div>
     </nav>
@@ -98,3 +100,8 @@
     </div>
   </main>
 </main>
+
+  )
+}
+
+
