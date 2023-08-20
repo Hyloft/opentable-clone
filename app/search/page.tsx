@@ -6,8 +6,30 @@ import { CardType } from "@/types/CardType";
 
 const prisma = new PrismaClient()
 
-const fetchRestaurants =async (city:string|null):Promise<CardType[]> => {
-  if(city == null){return await prisma.restaurant.findMany({
+// INTERFACES
+export interface typeSearchPageSearchParams{
+  city?:string,
+  region?:string,
+  cuisine?:string,
+  price?:string
+}
+
+interface typeSideBarFetchedProps{
+  cuisines: {
+      name: string;
+  }[],
+  locations: {
+      name: string;
+  }[],
+}
+
+export interface typeSideBarProps extends typeSideBarFetchedProps{
+  searchParams:typeSearchPageSearchParams
+}
+
+// FETCH FUNCTIONS
+const fetchRestaurants =async (city:string|null,cuisine:string|null,price:string|null):Promise<CardType[]> => {
+  if(!city && !cuisine && !price){return await prisma.restaurant.findMany({
     select:
       {
         id:true,
@@ -19,15 +41,27 @@ const fetchRestaurants =async (city:string|null):Promise<CardType[]> => {
         slug:true
       }
   })}
+  const where:any={
+    location:{
+      name:{
+        contains:city || ''
+      }
+    },
+    cuisine:{
+      name:{
+        contains:cuisine || ''
+      }
+    }
+  }
+  if(price){
+    const price_ = {
+     equals:price.toUpperCase() 
+    }
+    where.price = price_
+  }
   const restaurants = await prisma.restaurant.findMany(
     {
-      where:{
-        location:{
-          name:{
-            contains:city
-          }
-        }
-      },
+      where,
       select:
       {
         id:true,
@@ -43,16 +77,34 @@ const fetchRestaurants =async (city:string|null):Promise<CardType[]> => {
   return restaurants;
 }
 
+const fetchSideBarProps = async():Promise<typeSideBarFetchedProps>=>{
+  const cuisines = await prisma.cuisine.findMany({
+    select:{
+      name:true
+    }
+  })
+  const locations = await prisma.location.findMany({
+    select:{
+      name:true
+    }
+  })
+  return {cuisines,locations}
+}
 
-export default async function Search({searchParams}:{searchParams:{city:string}}) {
+// MAIN FUNCTION
+export default async function Search({searchParams}:{searchParams:typeSearchPageSearchParams}) {
   const city = searchParams.city?searchParams.city.toLowerCase():null
-  const restaurants = await fetchRestaurants(city);
+  const cuisine = searchParams.cuisine?searchParams.cuisine.toLowerCase():null
+  const price = searchParams.price?searchParams.price.toLowerCase():null
+  const restaurants = await fetchRestaurants(city,cuisine,price);
+  
+  const sideBarProps = await fetchSideBarProps();
   
   return (
     <>
       <Header />
       <div className="flex py-4 m-auto w-2/3 justify-between items-start">
-        <SearchSideBar />
+        <SearchSideBar props={{...sideBarProps,searchParams}} />
         <div className="w-5/6">
           {restaurants.length>0?restaurants.map(restaurant=>{
             return <ResaurantCard restaurant={restaurant} />
