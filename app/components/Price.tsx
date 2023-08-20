@@ -1,10 +1,11 @@
 import { PRICE } from "@prisma/client"
 
 interface Props{
-  price:PRICE
+  price:PRICE,
+  margin?:number;
 }
 
-const Price = ({price}:Props) => {
+const Price = ({price,margin}:Props) => {
   const renderPrices =() => {
     if (price === PRICE.CHEAP){
       return(
@@ -27,7 +28,7 @@ const Price = ({price}:Props) => {
     }
   }
   return (
-    <p className="mr-3">{renderPrices()}</p>
+    <p className={`mr-${margin?margin:3}`}>{renderPrices()}</p>
   )
 }
 
