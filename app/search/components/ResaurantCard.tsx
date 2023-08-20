@@ -1,8 +1,19 @@
 import Price from "@/app/components/Price"
 import { CardType } from "@/types/CardType"
 import Link from "next/link"
+import { Review } from '@prisma/client';
+import { calculateAverageReview } from "@/utils/ReviewAverage";
 
 const ResaurantCard = ({restaurant}:{restaurant:CardType}) => {
+  const renderReviewTitle = (reviews:Review[])=>{
+    let average = calculateAverageReview(reviews)
+
+    if (average >= 4) return "Awesome"
+    else if (average >= 3) return "Good"
+    else if (average >= 2.5) return "Okay"
+    else if (average > 0) return "Bad"
+    return ""
+  }
   return (
     <div className="border-b flex pb-5">
       <img
@@ -14,7 +25,7 @@ const ResaurantCard = ({restaurant}:{restaurant:CardType}) => {
         <h2 className="text-3xl">{restaurant.name}</h2>
         <div className="flex items-start">
           <div className="flex mb-2">*****</div>
-          <p className="ml-2 text-sm">Awesome</p>
+          <p className="ml-2 text-sm">{renderReviewTitle(restaurant.reviews)}</p>
         </div>
         <div className="mb-9">
           <div className="font-light flex text-reg">

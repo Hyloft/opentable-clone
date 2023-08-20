@@ -38,7 +38,8 @@ const fetchRestaurants =async (city:string|null,cuisine:string|null,price:string
         cuisine:true,
         location:true,
         price:true,
-        slug:true
+        slug:true,
+        reviews:true
       }
   })}
   const where:any={
@@ -70,7 +71,8 @@ const fetchRestaurants =async (city:string|null,cuisine:string|null,price:string
         cuisine:true,
         location:true,
         price:true,
-        slug:true
+        slug:true,
+        reviews:true
       }
     }
   )

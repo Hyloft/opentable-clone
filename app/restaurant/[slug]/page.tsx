@@ -19,7 +19,8 @@ const fetchRestaurant = async (slug:string): Promise<RestaurantType> => {
         name:true,
         images:true,
         description:true,
-        slug:true
+        slug:true,
+        reviews:true
       }
     }
   )
@@ -36,10 +37,10 @@ export default async function RestaurantDetails(props:any) {
   return (
     <>
       <Title name={restaurant.name}/>
-      <Rating />
+      <Rating reviews={restaurant.reviews}/>
       <Description description={restaurant.description}/>
       <Images images={restaurant.images}/>
-      <Reviews />
+      <Reviews reviews={restaurant.reviews} />
     </>
   );
 }
