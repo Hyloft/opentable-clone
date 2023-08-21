@@ -5,6 +5,7 @@ import Images from "./components/Images";
 import Reviews from "./components/Reviews";
 import { PrismaClient } from "@prisma/client";
 import { RestaurantType } from "./components/types/Restaurant";
+import { notFound } from "next/navigation";
 
 const prisma = new PrismaClient();
 
@@ -26,7 +27,8 @@ const fetchRestaurant = async (slug:string): Promise<RestaurantType> => {
   )
   
   if(!restaurant){
-    throw new Error()
+    // notFound() NOT WORKING NEXTJS CURRENT VERSION
+    throw new Error('Restaurant cannot found')
   }
 
   return restaurant
