@@ -10,6 +10,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (req.method !== "POST") {
+    return res.status(404).json({
+      errorMessage: "invalid request",
+    });
+  }
   const { firstName, lastName, email, phone, city, password }:{firstName:string, lastName:string, email:string, phone:string, city:string, password:string } = req.body;
   let errors: string[] = [];
 
