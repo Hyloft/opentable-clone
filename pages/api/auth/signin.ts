@@ -56,7 +56,7 @@ export default async function handler(
 
   const token = await new jose.SignJWT({email:userWithEmail.email})
   .setProtectedHeader({alg:'HS256'})
-  .setExpirationTime(24)
+  .setExpirationTime("24h")
   .sign(secret)
 
 
