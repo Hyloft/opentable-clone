@@ -20,7 +20,7 @@ const style = {
   p: 4,
 };
 
-interface InputChange {
+export interface SignInInputs {
   firstName: string;
   lastName: string;
   phone: string;
@@ -30,7 +30,7 @@ interface InputChange {
 }
 
 export interface AuthInputProps {
-  inputValues: InputChange;
+  inputValues: SignInInputs;
   handleChange(event: ChangeEvent<HTMLInputElement>): void;
   isSignIn: boolean;
 }
@@ -87,7 +87,13 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
         email: inputValues.email,
         password: inputValues.password,
       }).then((res) => {
-        if (data) {
+        if (!res.errorMessage) {
+          handleClose();
+        }
+      });
+    } else {
+      signUp(inputValues).then((res) => {
+        if (!res.errorMessage) {
           handleClose();
         }
       });
