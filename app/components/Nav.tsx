@@ -7,7 +7,7 @@ import { AuthenticationContext } from "../context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Nav(){
-  const {data,loading} = useContext(AuthenticationContext)
+  const {data,loading,initialLoad} = useContext(AuthenticationContext)
   const {singOut} = useAuth()
   return(
     <nav className="bg-white p-2 flex justify-between">
@@ -15,7 +15,7 @@ export default function Nav(){
             {" "} OpenTable{" "}
           </Link>
           <div>
-            {loading||
+            {loading&&!initialLoad||
             <div className="flex">
               {data?
                 <>

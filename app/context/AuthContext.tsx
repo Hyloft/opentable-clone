@@ -19,6 +19,7 @@ interface State {
 }
 
 interface AuthState extends State {
+  initialLoad:boolean
   setAuthState: React.Dispatch<React.SetStateAction<State>>;
 }
 
@@ -26,6 +27,7 @@ export const AuthenticationContext = createContext<AuthState>({
   loading: false,
   error: null,
   data: null,
+  initialLoad:false,
   setAuthState: () => {},
 });
 
@@ -36,10 +38,13 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
     error: null,
   });
 
+  const [initialLoad, setInitialLoad] = useState(false);
+
   useEffect(() => {
-    fetchUserFromJWT()
-  }, [])
-  
+    fetchUserFromJWT().then(() => {
+      setInitialLoad(true);
+    });
+  }, []);
 
   const fetchUserFromJWT = async () => {
     try {
@@ -55,14 +60,14 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
         },
       });
 
-      axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
+      axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
 
       setAuthState({
         loading: false,
         error: null,
         data: response.data,
       });
-    } catch (error:any) {
+    } catch (error: any) {
       setAuthState({
         loading: false,
         error: error.response.data.errorMessage,
@@ -72,7 +77,7 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthenticationContext.Provider value={{ ...authState, setAuthState }}>
+    <AuthenticationContext.Provider value={{ ...authState, initialLoad, setAuthState }}>
       {children}
     </AuthenticationContext.Provider>
   );

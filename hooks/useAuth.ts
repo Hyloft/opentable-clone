@@ -5,9 +5,7 @@ import { useContext } from "react";
 import { deleteCookie } from "cookies-next";
 
 export const useAuth = () => {
-  const { error, loading, data, setAuthState } = useContext(
-    AuthenticationContext
-  );
+  const { setAuthState } = useContext(AuthenticationContext);
 
   const signIn = async ({
     email,
