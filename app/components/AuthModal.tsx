@@ -2,10 +2,9 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import AuthModalInputs from "./AuthModalInputs";
+import { useAuth } from "@/hooks/useAuth";
 
 const style = {
   position: "absolute" as "absolute",
@@ -38,6 +37,8 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const { signIn, signUp } = useAuth();
+
   const renderContent = (signInText: string, signUpText: string) => {
     return isSignIn ? signInText : signUpText;
   };
@@ -54,17 +55,17 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
   const [disabled, setDisabled] = useState(true);
 
   useEffect(() => {
-    if(isSignIn){
-      if(inputValues.password !=="" && inputValues.email!==""){
-        setDisabled(false)
-      }else{
-        setDisabled(true)
+    if (isSignIn) {
+      if (inputValues.password !== "" && inputValues.email !== "") {
+        setDisabled(false);
+      } else {
+        setDisabled(true);
       }
-    }else{
-      if(Object.values(inputValues).filter(val=>(val==='')).length===0){
-        setDisabled(false)
-      }else{
-        setDisabled(true)
+    } else {
+      if (Object.values(inputValues).filter((val) => val === "").length === 0) {
+        setDisabled(false);
+      } else {
+        setDisabled(true);
       }
     }
     return () => {};
@@ -75,6 +76,15 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
       ...inputValues,
       [event.target.name]: event.target.value,
     });
+  };
+
+  const handleClick = () => {
+    if (isSignIn) {
+      signIn({
+        email: inputValues.email,
+        password: inputValues.password,
+      });
+    }
   };
 
   return (
@@ -123,6 +133,7 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
           <button
             className="uppercase bg-red-600 w-full text-white p-3 mt-3 rounded text-sm mb-5 disabled:bg-gray-400"
             disabled={disabled}
+            onClick={handleClick}
           >
             {renderContent("Log In", "Sign Up")}
           </button>
