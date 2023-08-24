@@ -3,11 +3,9 @@ import Rating from "./components/Rating";
 import Description from "./components/Description";
 import Images from "./components/Images";
 import Reviews from "./components/Reviews";
-import { PrismaClient } from "@prisma/client";
 import { RestaurantType } from "./components/types/Restaurant";
-import { notFound } from "next/navigation";
+import { prisma } from "@/app/db";
 
-const prisma = new PrismaClient();
 
 const fetchRestaurant = async (slug:string): Promise<RestaurantType> => {
   const restaurant = await prisma.restaurant.findUnique(

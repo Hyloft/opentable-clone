@@ -1,8 +1,5 @@
+import { prisma } from "@/app/db";
 import Menu from "./components/Menu";
-
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 const fetchRestaurantItems = async (slug:string) => {
   const restaurant = await prisma.restaurant.findUnique(

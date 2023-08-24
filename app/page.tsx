@@ -1,7 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import Card from "./components/Card";
 import Header from "./components/Header";
 import { CardType } from "@/types/CardType";
+import { prisma } from "./db";
 
 // import { prisma } from './db';
 
@@ -11,7 +11,6 @@ import { CardType } from "@/types/CardType";
 //   return {props:{restaurants}};
 // }
 
-const prisma = new PrismaClient()
 
 const fetchRestaurants =async ():Promise<CardType[]> => {
   const restaurants = await prisma.restaurant.findMany(

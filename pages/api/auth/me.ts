@@ -20,5 +20,11 @@ export default async function handler(
     return errorUnauthorized();
   }
 
-  return res.json({ me: user });
+  return res.status(200).json({
+    firstName:user.first_name,
+    lastName:user.last_name,
+    email:user.email,
+    city:user.city,
+    phone:user.phone,
+  });
 }

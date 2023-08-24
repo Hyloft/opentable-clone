@@ -1,10 +1,9 @@
 import Header from "./components/Header";
 import SearchSideBar from "./components/SearchSideBar";
 import ResaurantCard from "./components/ResaurantCard";
-import { PrismaClient } from "@prisma/client";
 import { CardType } from "@/types/CardType";
+import { prisma } from "../db";
 
-const prisma = new PrismaClient()
 
 // INTERFACES
 export interface typeSearchPageSearchParams{
