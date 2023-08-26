@@ -1,5 +1,6 @@
 import { prisma } from "@/app/db";
 import { times } from "@/data";
+import { filterTimeByRestaurant } from "@/utils/filterTimeByRestaurant";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -61,6 +62,8 @@ export default async function handler(
     },
     select: {
       tables: true,
+      close_time: true,
+      open_time: true,
     },
   });
 
@@ -74,17 +77,40 @@ export default async function handler(
     return {
       date: new Date(`${day}T${searchTime}`),
       time: searchTime,
-      tables:tables.filter(table=>{
-        if(bookingTableObject[`${day}T${searchTime}`]){
-          if(bookingTableObject[`${day}T${searchTime}`][table.id]){
-            return false
+      tables: tables.filter((table) => {
+        if (bookingTableObject[`${day}T${searchTime}`]) {
+          if (bookingTableObject[`${day}T${searchTime}`][table.id]) {
+            return false;
           }
         }
-        return true
-      })
+        return true;
+      }),
     };
   });
 
-  return res.json({ bookingTableObject, tables, searchTimesWithAvailableTables });
+  const availableTimes = filterTimeByRestaurant(
+    restaurant.open_time,
+    restaurant.close_time
+  );
+
+  const availabilities = searchTimesWithAvailableTables
+    .map((t) => {
+      const sumSeats = t.tables.reduce((sum, table) => sum + table.seats, 0);
+
+      return {
+        time: t.time,
+        available: sumSeats >= parseInt(partySize),
+      };
+    })
+    .filter((availability) => {
+      if (
+        availableTimes.filter((t) => t.time == availability.time).length > 0
+      ) {
+        return true;
+      }
+      return false;
+    });
+
+  return res.json({ availabilities });
 }
 //http://localhost:3000/api/restaurant/vivaan-fine-indian-cuisine-ottawa/availability?day=2023-01-01&time=20:00:00.000Z&partySize=5
