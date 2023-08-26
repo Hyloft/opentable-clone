@@ -1,6 +1,7 @@
 "use client";
 
 import { partySize, times } from "@/data";
+import { filterTimeByRestaurant } from "@/utils/filterTimeByRestaurant";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 
@@ -14,31 +15,7 @@ const ReservationCard = ({openTime,closeTime}:{openTime:string,closeTime:string}
     return setSelectedDate(null);
   };
 
-  const filterTimeByRestaurant = ()=>{
-    interface timeType{
-      displayTime: string;
-      time: string;
-      searchTimes: string[];
-    }
-    const timesWithinWindow:timeType[] = []
-
-    let isWithinWindow = false
-    
-    times.forEach(time=>{
-      if (time.time == openTime){
-        isWithinWindow = true
-      }
-      if (time.time == closeTime){
-        isWithinWindow = false
-      }
-      if(isWithinWindow){
-        timesWithinWindow.push(time)
-      }
-    })
-    return timesWithinWindow
-  }
-
-  const timesWithinWindow = filterTimeByRestaurant()
+  const timesWithinWindow = filterTimeByRestaurant(openTime,closeTime)
 
   const partySizeOptions = partySize.map((size) => {
     return <option value={size.value}>{size.label}</option>;
