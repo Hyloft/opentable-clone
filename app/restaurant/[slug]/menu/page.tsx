@@ -1,14 +1,18 @@
 import { prisma } from "@/app/db";
 import Menu from "./components/Menu";
+import RestaurantNav from "../components/RestaurantNav";
+import ReservationCard from "../components/ReservationCard";
 
-const fetchRestaurantItems = async (slug:string) => {
+const fetchRestaurant = async (slug:string) => {
   const restaurant = await prisma.restaurant.findUnique(
     {
       where:{
         slug
       },
       select:{
-        items:true
+        items:true,
+        close_time:true,
+        open_time:true
       }
     }
   )
@@ -17,16 +21,20 @@ const fetchRestaurantItems = async (slug:string) => {
     throw new Error()
   }
 
-  return restaurant.items
+  return restaurant
 }
 
 
 export default async function RestaurantMenuPage({params}:{params:{slug:string}}) {
-  const items = await fetchRestaurantItems(params.slug)
+  const restaurant = await fetchRestaurant(params.slug)
   
   return (
     <>
-      <Menu items={items}/>
-    </>
+    <div className="bg-white w-[70%] rounded p-3 shadow">
+      <RestaurantNav slug={params.slug} />
+      <Menu items={restaurant.items}/>
+    </div>
+    <ReservationCard openTime={restaurant.open_time} closeTime={restaurant.close_time} />
+  </>
   );
 }
