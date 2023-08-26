@@ -28,8 +28,8 @@ model Restaurant {
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   reviews     Review[]
-  Bookings    Booking[]
-  Tables      Table[]
+  bookings    Booking[]
+  tables      Table[]
 }
 
 model Item {
