@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function useAvailability() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<{availabilities:{time:string,available:boolean}[]} | null>(null);
 
   const fetchAvailabilities = async ({
     slug,

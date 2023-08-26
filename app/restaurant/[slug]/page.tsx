@@ -46,7 +46,7 @@ export default async function RestaurantDetails(props: any) {
         <Images images={restaurant.images} />
         <Reviews reviews={restaurant.reviews} />
       </div>
-      <ReservationCard openTime={restaurant.open_time} closeTime={restaurant.close_time} />
+      <ReservationCard slug={props.params.slug} openTime={restaurant.open_time} closeTime={restaurant.close_time} />
     </>
   );
 }
