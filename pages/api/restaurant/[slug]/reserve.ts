@@ -1,5 +1,6 @@
 import { prisma } from "@/app/db";
 import { findAvailableTables } from "@/services/findAvailableTables";
+import { ReservationBody } from "@/types/ReservationBodyType";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -26,14 +27,7 @@ export default async function handler(
     bookerLastName,
     bookerOccation,
     bookerRequest,
-  }: {
-    bookerEmail: string;
-    bookerPhone: string;
-    bookerFirstName: string;
-    bookerLastName: string;
-    bookerOccation: string | null;
-    bookerRequest: string | null;
-  } = req.body;
+  }: ReservationBody = req.body;
 
   const nextErrorResponse = (error?: string) => {
     return res.status(400).json({
