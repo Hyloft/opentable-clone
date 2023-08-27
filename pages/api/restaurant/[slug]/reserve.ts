@@ -6,12 +6,34 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (req.method !== "POST") {
+    return res
+      .status(404)
+      .json({ errorMessage: "This endpoint only accept POST requests" });
+  }
+
   const { day, time, partySize, slug } = req.query as {
     day: string;
     time: string;
     partySize: string;
     slug: string;
   };
+
+  const {
+    bookerEmail,
+    bookerPhone,
+    bookerFirstName,
+    bookerLastName,
+    bookerOccation,
+    bookerRequest,
+  }: {
+    bookerEmail: string;
+    bookerPhone: string;
+    bookerFirstName: string;
+    bookerLastName: string;
+    bookerOccation: string | null;
+    bookerRequest: string | null;
+  } = req.body;
 
   const nextErrorResponse = (error?: string) => {
     return res.status(400).json({
@@ -22,6 +44,7 @@ export default async function handler(
   const restaurant = await prisma.restaurant.findUnique({
     where: { slug },
     select: {
+      id: true,
       open_time: true,
       close_time: true,
     },
@@ -107,6 +130,26 @@ export default async function handler(
     nextErrorResponse("Cannot place seats");
   }
 
-  return res.json({ tablesCount, tablesToBooks });
+  const booking = await prisma.booking.create({
+    data: {
+      number_of_people: parseInt(partySize),
+      booking_time: new Date(`${day}T${time}`),
+      booker_email: bookerEmail,
+      booker_first_name: bookerFirstName,
+      booker_last_name: bookerLastName,
+      booker_phone: bookerPhone,
+      booker_occasion: bookerOccation,
+      booker_request: bookerRequest,
+      restaurant_id: restaurant.id,
+    },
+  });
+
+  const bookingRelations = await prisma.bookingTable.createMany({
+    data: tablesToBooks.map((t) => {
+      return { booking_id: booking.id, table_id: t };
+    }),
+  });
+
+  return res.json(booking);
 }
 //http://localhost:3000/api/restaurant/vivaan-fine-indian-cuisine-ottawa/reserve?day=2023-01-01&time=20:00:00.000Z&partySize=5
