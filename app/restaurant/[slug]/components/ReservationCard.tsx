@@ -103,7 +103,7 @@ const ReservationCard = ({
               {data.availabilities.map((time) =>
                 time.available ? (
                   <Link
-                    href={`reserve/${slug}?date=${day}T${time.time}&partySize=${party}`}
+                    href={`/reserve/${slug}?date=${day}T${time.time}&partySize=${party}`}
                     className="bg-red-600 cursor-pointer p-2 w-24 text-center text-white mb-3 rounded mr-3"
                   >
                     <p className="text-sm font-bold">
