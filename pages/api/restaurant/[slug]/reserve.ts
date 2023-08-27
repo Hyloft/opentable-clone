@@ -1,4 +1,5 @@
 import { prisma } from "@/app/db";
+import { findAvailableTables } from "@/services/findAvailableTables";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -31,8 +32,25 @@ export default async function handler(
   if (
     new Date(`${day}T${time}`) < new Date(`${day}T${restaurant.open_time}`) ||
     new Date(`${day}T${time}`) > new Date(`${day}T${restaurant.close_time}`)
-  ) return invalidDataError("Restaurant is not open at that time");
+  )
+    return invalidDataError("Restaurant is not open at that time");
 
-  return res.json({ day, time, partySize });
+  const searchTimesWithAvailableTables = await findAvailableTables({
+    res,
+    slug,
+    time,
+    day,
+  });
+
+  if (!searchTimesWithAvailableTables)
+    return invalidDataError("No available tables");
+
+  const searchTimeWithTables = searchTimesWithAvailableTables.find(
+    (t) => t.date.toISOString() == `${day}T${time}`
+  );
+
+  if (!searchTimeWithTables) return invalidDataError("No availability");
+
+  return res.json({ searchTimeWithTables });
 }
 //http://localhost:3000/api/restaurant/vivaan-fine-indian-cuisine-ottawa/reserve?day=2023-01-01&time=20:00:00.000Z&partySize=5

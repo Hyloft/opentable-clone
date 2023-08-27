@@ -1,5 +1,6 @@
 import { prisma } from "@/app/db";
 import { times } from "@/data";
+import { findAvailableTables } from "@/services/findAvailableTables";
 import { filterTimeByRestaurant } from "@/utils/filterTimeByRestaurant";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -24,44 +25,11 @@ export default async function handler(
     return invalidDataError();
   }
 
-  const searchTimes = times.find((t) => t.time === time)?.searchTimes;
-
-  if (!searchTimes) {
-    return invalidDataError();
-  }
-
-  const bookings = await prisma.booking.findMany({
-    where: {
-      booking_time: {
-        gte: new Date(`${day}T${searchTimes[0]}`),
-        lte: new Date(`${day}T${searchTimes[searchTimes.length - 1]}`),
-      },
-    },
-    select: {
-      number_of_people: true,
-      booking_time: true,
-      tables: true,
-    },
-  });
-
-  const bookingTableObject: { [key: string]: { [key: number]: true } } = {};
-
-  bookings.forEach((booking) => {
-    bookingTableObject[booking.booking_time.toISOString()] =
-      booking.tables.reduce((obj, table) => {
-        return {
-          ...obj,
-          [table.table_id]: true,
-        };
-      }, {});
-  });
-
   const restaurant = await prisma.restaurant.findUnique({
     where: {
       slug: slug,
     },
     select: {
-      tables: true,
       close_time: true,
       open_time: true,
     },
@@ -71,22 +39,16 @@ export default async function handler(
     return invalidDataError("No restaurant found");
   }
 
-  const tables = restaurant.tables;
-
-  const searchTimesWithAvailableTables = searchTimes.map((searchTime) => {
-    return {
-      date: new Date(`${day}T${searchTime}`),
-      time: searchTime,
-      tables: tables.filter((table) => {
-        if (bookingTableObject[`${day}T${searchTime}`]) {
-          if (bookingTableObject[`${day}T${searchTime}`][table.id]) {
-            return false;
-          }
-        }
-        return true;
-      }),
-    };
+  const searchTimesWithAvailableTables = await findAvailableTables({
+    res,
+    slug,
+    time,
+    day,
   });
+
+  if (!searchTimesWithAvailableTables) {
+    return invalidDataError("No tables found at that time");
+  }
 
   const availableTimes = filterTimeByRestaurant(
     restaurant.open_time,
