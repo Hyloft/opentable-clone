@@ -3,6 +3,6 @@ export interface ReservationBody{
   bookerPhone: string;
   bookerFirstName: string;
   bookerLastName: string;
-  bookerOccation: string | null;
+  bookerOccasion: string | null;
   bookerRequest: string | null;
 }

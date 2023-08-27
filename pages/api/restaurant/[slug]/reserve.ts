@@ -25,7 +25,7 @@ export default async function handler(
     bookerPhone,
     bookerFirstName,
     bookerLastName,
-    bookerOccation,
+    bookerOccasion,
     bookerRequest,
   }: ReservationBody = req.body;
 
@@ -132,7 +132,7 @@ export default async function handler(
       booker_first_name: bookerFirstName,
       booker_last_name: bookerLastName,
       booker_phone: bookerPhone,
-      booker_occasion: bookerOccation,
+      booker_occasion: bookerOccasion,
       booker_request: bookerRequest,
       restaurant_id: restaurant.id,
     },

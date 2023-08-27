@@ -40,7 +40,12 @@ export default async function ReservationPage({
             name={restaurant.name}
             image={restaurant.main_image}
           />
-          <Form />
+          <Form
+            day={day}
+            time={time}
+            partySize={partySize}
+            slug={params.slug}
+          />
         </div>
       </div>
     </>
