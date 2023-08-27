@@ -13,7 +13,7 @@ export default async function handler(
     slug: string;
   };
 
-  const invalidDataError = (error?: string) => {
+  const nextErrorResponse = (error?: string) => {
     return res.status(400).json({
       errorMessage: error || "Invalid data provided",
     });
@@ -27,13 +27,13 @@ export default async function handler(
     },
   });
 
-  if (!restaurant) return invalidDataError("No restaurant found");
+  if (!restaurant) return nextErrorResponse("No restaurant found");
 
   if (
     new Date(`${day}T${time}`) < new Date(`${day}T${restaurant.open_time}`) ||
     new Date(`${day}T${time}`) > new Date(`${day}T${restaurant.close_time}`)
   )
-    return invalidDataError("Restaurant is not open at that time");
+    return nextErrorResponse("Restaurant is not open at that time");
 
   const searchTimesWithAvailableTables = await findAvailableTables({
     res,
@@ -43,14 +43,70 @@ export default async function handler(
   });
 
   if (!searchTimesWithAvailableTables)
-    return invalidDataError("No available tables");
+    return nextErrorResponse("No available tables");
 
   const searchTimeWithTables = searchTimesWithAvailableTables.find(
     (t) => t.date.toISOString() == `${day}T${time}`
   );
 
-  if (!searchTimeWithTables) return invalidDataError("No availability");
+  if (!searchTimeWithTables) return nextErrorResponse("No availability");
 
-  return res.json({ searchTimeWithTables });
+  const tablesCount: {
+    2: number[];
+    4: number[];
+  } = {
+    2: [],
+    4: [],
+  };
+
+  searchTimeWithTables.tables.forEach((table) => {
+    if (table.seats === 2) tablesCount[2].push(table.id);
+    if (table.seats === 4) tablesCount[4].push(table.id);
+  });
+
+  const tablesToBooks: number[] = [];
+
+  let seatsRemaining = parseInt(partySize);
+
+  const handlePlacement = () => {
+    while (seatsRemaining > 0) {
+      if (seatsRemaining > 2) {
+        if (tablesCount[4].length) {
+          tablesToBooks.push(tablesCount[4][0]);
+          tablesCount[4].shift();
+          seatsRemaining -= 4;
+        } else if (tablesCount[2].length > 1) {
+          for (let index = 0; index < 2; index++) {
+            tablesToBooks.push(tablesCount[2][0]);
+            tablesCount[2].shift();
+            seatsRemaining -= 2;
+          }
+        } else {
+          return false;
+        }
+      } else {
+        if (tablesCount[2].length) {
+          tablesToBooks.push(tablesCount[2][0]);
+          tablesCount[2].shift();
+          seatsRemaining -= seatsRemaining;
+        } else if (tablesCount[4].length) {
+          tablesToBooks.push(tablesCount[4][0]);
+          tablesCount[4].shift();
+          seatsRemaining -= seatsRemaining;
+        } else {
+          return false;
+        }
+      }
+      if (seatsRemaining < 1) return true;
+    }
+  };
+
+  const placement = handlePlacement();
+
+  if (!placement) {
+    nextErrorResponse("Cannot place seats");
+  }
+
+  return res.json({ tablesCount, tablesToBooks });
 }
 //http://localhost:3000/api/restaurant/vivaan-fine-indian-cuisine-ottawa/reserve?day=2023-01-01&time=20:00:00.000Z&partySize=5
