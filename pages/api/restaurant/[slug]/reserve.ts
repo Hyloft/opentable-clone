@@ -1,6 +1,7 @@
 import { prisma } from "@/app/db";
 import { findAvailableTables } from "@/services/findAvailableTables";
 import { ReservationBody } from "@/types/ReservationBodyType";
+import { filterTimeByRestaurant } from "@/utils/filterTimeByRestaurant";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -80,6 +81,34 @@ export default async function handler(
     if (table.seats === 2) tablesCount[2].push(table.id);
     if (table.seats === 4) tablesCount[4].push(table.id);
   });
+
+  const availableTimes = filterTimeByRestaurant(
+    restaurant.open_time,
+    restaurant.close_time
+  );
+
+  const availabilities = searchTimesWithAvailableTables
+    .map((t) => {
+      const sumSeats = t.tables.reduce((sum, table) => sum + table.seats, 0);
+      console.log(sumSeats)
+      return {
+        time: t.time,
+        available: sumSeats >= parseInt(partySize),
+      };
+    })
+    .filter((availability) => {
+      if (
+        availableTimes.filter((t) => t.time == availability.time).length > 0
+      ) {
+        return true;
+      }
+      return false;
+    });
+  
+  console.log(availabilities.find(a => searchTimeWithTables.date.toISOString().split('T')[1] === a.time))
+  if(! availabilities.find(a => searchTimeWithTables.date.toISOString().split('T')[1] === a.time)?.available  ){
+    return nextErrorResponse('Restoraunt not available at that time for that much people')
+  }
 
   const tablesToBooks: number[] = [];
 
