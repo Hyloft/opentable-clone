@@ -4,6 +4,7 @@ import useReservation from "@/hooks/useReservation";
 import { ReservationBody } from "@/types/ReservationBodyType";
 import { Alert, CircularProgress } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 const Form = ({
   slug,
@@ -34,6 +35,13 @@ const Form = ({
   let keysDisabled = Object.keys(data).filter(
     (k) => k !== "bookerRequest" && k !== "bookerOccasion"
   );
+
+  useEffect(() => {
+    const s = io("ws://localhost:3001");
+    s.on("hello", (...args: any[]) => {
+      console.log(args);
+    });
+  }, []);
 
   useEffect(() => {
     let d = false;
@@ -67,13 +75,19 @@ const Form = ({
   };
   return (
     <div className="mt-10 flex flex-wrap justify-between w-[660px]">
-      {error ? <Alert severity="error" className="w-[100%] mb-3">{error}</Alert> : null}
-      {success ? 
-      <div>
-        <p className="text-lg">Reservation Completed</p>
-        <p className="text-reg italic">You successfully made a reservation!</p>
-      </div>
-      : (
+      {error ? (
+        <Alert severity="error" className="w-[100%] mb-3">
+          {error}
+        </Alert>
+      ) : null}
+      {success ? (
+        <div>
+          <p className="text-lg">Reservation Completed</p>
+          <p className="text-reg italic">
+            You successfully made a reservation!
+          </p>
+        </div>
+      ) : (
         <>
           <input
             type="text"

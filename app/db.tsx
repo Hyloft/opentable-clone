@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import Redis from 'ioredis'
 
 const prismaClientSingleton = () => {
   return new PrismaClient()
@@ -13,3 +14,5 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+export const redis = new Redis()

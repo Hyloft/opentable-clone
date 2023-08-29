@@ -105,7 +105,6 @@ export default async function handler(
       return false;
     });
   
-  console.log(availabilities.find(a => searchTimeWithTables.date.toISOString().split('T')[1] === a.time))
   if(! availabilities.find(a => searchTimeWithTables.date.toISOString().split('T')[1] === a.time)?.available  ){
     return nextErrorResponse('Restoraunt not available at that time for that much people')
   }
