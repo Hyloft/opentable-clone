@@ -4,6 +4,10 @@ import { ReservationBody } from "@/types/ReservationBodyType";
 import { filterTimeByRestaurant } from "@/utils/filterTimeByRestaurant";
 import { NextApiRequest, NextApiResponse } from "next";
 
+interface ReservationBodyType extends ReservationBody {
+  temporary?: boolean;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -28,7 +32,8 @@ export default async function handler(
     bookerLastName,
     bookerOccasion,
     bookerRequest,
-  }: ReservationBody = req.body;
+    temporary,
+  }: ReservationBodyType = req.body;
 
   const nextErrorResponse = (error?: string) => {
     return res.status(400).json({
@@ -90,7 +95,7 @@ export default async function handler(
   const availabilities = searchTimesWithAvailableTables
     .map((t) => {
       const sumSeats = t.tables.reduce((sum, table) => sum + table.seats, 0);
-      console.log(sumSeats)
+      console.log(sumSeats);
       return {
         time: t.time,
         available: sumSeats >= parseInt(partySize),
@@ -104,9 +109,15 @@ export default async function handler(
       }
       return false;
     });
-  
-  if(! availabilities.find(a => searchTimeWithTables.date.toISOString().split('T')[1] === a.time)?.available  ){
-    return nextErrorResponse('Restoraunt not available at that time for that much people')
+
+  if (
+    !availabilities.find(
+      (a) => searchTimeWithTables.date.toISOString().split("T")[1] === a.time
+    )?.available
+  ) {
+    return nextErrorResponse(
+      "Restoraunt not available at that time for that much people"
+    );
   }
 
   const tablesToBooks: number[] = [];
@@ -150,6 +161,17 @@ export default async function handler(
 
   if (!placement) {
     nextErrorResponse("Cannot place seats");
+  }
+
+  if (temporary) {
+    const temporaryData = {
+      number_of_people: parseInt(partySize),
+      booking_time: new Date(`${day}T${time}`),
+      tables: tablesToBooks.map((t) => {
+        return { booking_id: -1, table_id: t };
+      }),
+    };
+    return res.json(temporaryData);
   }
 
   const booking = await prisma.booking.create({
