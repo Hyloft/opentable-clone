@@ -2,6 +2,7 @@
 
 import useReservation from "@/hooks/useReservation";
 import { ReservationBody } from "@/types/ReservationBodyType";
+import { SocketClient } from "@/types/SocketType";
 import { Alert, CircularProgress } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
 import { io } from "socket.io-client";
@@ -37,7 +38,7 @@ const Form = ({
   );
 
   useEffect(() => {
-    const s = io("ws://localhost:3001");
+    const s: SocketClient = io("ws://localhost:3001");
     s.on("hello", (...args: any[]) => {
       console.log(args);
     });
