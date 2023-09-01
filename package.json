@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently --kill-others \"next dev\" \"node -r esm socket.js\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -46,7 +46,8 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/react-datepicker": "^4.15.0",
     "@types/uuid": "^9.0.3",
-    "@types/validator": "^13.11.1"
+    "@types/validator": "^13.11.1",
+    "concurrently": "^8.2.1"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.7",

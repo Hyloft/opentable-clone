@@ -1,12 +1,10 @@
 "use client";
 
 import useReservation from "@/hooks/useReservation";
-import useReserveTemporary from "@/hooks/useReserveTemporary";
 import { ReservationBody } from "@/types/ReservationBodyType";
-import { SocketClient } from "@/types/SocketType";
-import { Alert, AlertTitle, CircularProgress } from "@mui/material";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import { Alert, CircularProgress } from "@mui/material";
+import { ChangeEvent, useEffect, useState } from "react";
+import TemporaryReservationHeader from "./TemporaryReservationHeader";
 
 const Form = ({
   slug,
@@ -34,52 +32,14 @@ const Form = ({
 
   const [disabled, setDisabled] = useState(true);
 
-  const [timer, setTimer] = useState(120);
-
-  const timerRef = useRef(120);
+  const [temporaryReservation, setTemporaryReservation] = useState(false);
 
   const [endTemporary, setEndTemporary] =
     useState<() => Promise<boolean> | null>();
 
-  function fmtMSS(s: number) {
-    return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
-  }
-
-  const startTimer = () => {
-    let intv: any = setInterval(async () => {
-      if (timerRef.current <= 0) {
-        if (endTemporary) await endTemporary();
-        setTemporaryReservation(false);
-        return clearInterval(intv);
-      }
-      timerRef.current -= 1;
-      setTimer(timerRef.current);
-    }, 1000);
-    return () => clearInterval(intv);
-  };
-
   let keysDisabled = Object.keys(data).filter(
     (k) => k !== "bookerRequest" && k !== "bookerOccasion"
   );
-
-  const [temporaryReservation, setTemporaryReservation] = useState(false);
-
-  const afterTemporaryReservation = () => {
-    setTemporaryReservation(true);
-    startTimer();
-  };
-
-  useEffect(() => {
-    const socket: SocketClient = io("ws://localhost:3001");
-    const {
-      createTemporaryReservation,
-      setEventAfterSocketResponse,
-      endTemporaryReservation,
-    } = useReserveTemporary(socket);
-    createTemporaryReservation({ day, time, partySize, slug });
-    setEndTemporary(() => endTemporaryReservation);
-    setEventAfterSocketResponse(afterTemporaryReservation);
-  }, []);
 
   useEffect(() => {
     let d = false;
@@ -117,17 +77,22 @@ const Form = ({
   };
   return (
     <div className="mt-10 flex flex-wrap justify-between w-[660px]">
+      <TemporaryReservationHeader
+        setTemporaryReservation={setTemporaryReservation}
+        endTemporary={endTemporary}
+        setEndTemporary={setEndTemporary}
+        day={day}
+        time={time}
+        partySize={partySize}
+        slug={slug}
+        temporaryReservation={temporaryReservation}
+      />
       {error ? (
         <Alert severity="error" className="w-[100%] mb-3">
           {error}
         </Alert>
       ) : null}
-      {temporaryReservation ? (
-        <Alert severity="info" className="w-[100%] mb-3">
-          <AlertTitle>This Reservation Booked Temporary For You!</AlertTitle>
-          {fmtMSS(timer)} <strong>minutes left!</strong>
-        </Alert>
-      ) : null}
+
       {success ? (
         <div>
           <p className="text-lg">Reservation Completed</p>
