@@ -95,7 +95,6 @@ export default async function handler(
   const availabilities = searchTimesWithAvailableTables
     .map((t) => {
       const sumSeats = t.tables.reduce((sum, table) => sum + table.seats, 0);
-      console.log(sumSeats);
       return {
         time: t.time,
         available: sumSeats >= parseInt(partySize),

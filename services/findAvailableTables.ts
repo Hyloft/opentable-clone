@@ -1,6 +1,5 @@
 import { prisma, redis } from "@/app/db";
 import { times } from "@/data";
-import { EmitReserveTemporary } from "@/types/SocketType";
 import { NextApiResponse } from "next";
 
 export const findAvailableTables = async ({
@@ -52,7 +51,7 @@ export const findAvailableTables = async ({
           ...obj,
           [table.table_id]: true,
         };
-      }, {});
+      }, bookingTableObject[booking.booking_time.toISOString()]);
   });
 
   const restaurant = await prisma.restaurant.findUnique({
