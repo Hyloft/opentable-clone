@@ -57,7 +57,7 @@ const TemporaryReservationHeader = ({
     <>
       {temporaryReservation ? (
         <Alert severity="info" className="w-[100%] mb-3">
-          <AlertTitle>This Reservation Booked Temporary For You!</AlertTitle>
+          <AlertTitle>This reservation temporarily booked for you!</AlertTitle>
           {fmtMSS(timer)} <strong>minutes left!</strong>
         </Alert>
       ) : (
