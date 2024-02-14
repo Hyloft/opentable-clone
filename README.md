@@ -1,4 +1,4 @@
-<h1 style='text-align: center;'>OpenTable Clone</h1>
+<h1 align="center">OpenTable Clone</h1>
 
 <p align="center">
   A project developed to gain hands-on experience in building a booking and availability system.
@@ -7,7 +7,7 @@
 ![Main Page](./public/images/main_page.png)
 
 
-<h3 style='text-align: center;'>Tech Stack</h3>
+<h3 align="center">Tech Stack</h3>
 
 <div align="center">
 
@@ -34,13 +34,15 @@
 1. Choose the number of people and desired reservation time.
 2. View available times for the selected criteria near the chosen time.
 
-   ![Available Times GIF](<GIF_URL>)
+   <img src="https://github.com/Hyloft/opentable-clone/assets/72349457/5376b017-5188-44aa-b57a-62a24caf71c1" width="450"/>
 
-3. Click on your preferred time to temporarily reserve the booking.
+4. Click on your preferred time to temporarily reserve the booking.
 
-   ![Reservation GIF](<GIF_URL>)
+   <img src="https://github.com/Hyloft/opentable-clone/assets/72349457/faf34628-5b84-4182-ae48-8adf47655891" width="550"/>
+   
 
-4. The reservation is held until you close the window or the duration ends.
+
+6. The reservation is held until you close the window or the duration ends.
 
 The system utilizes **Redis** and **WebSocket** for temporary reservations.
 
@@ -48,4 +50,5 @@ The system utilizes **Redis** and **WebSocket** for temporary reservations.
 
 5. Other users cannot book the tables at the time you reserved except if the restaurant has any other available tables.
 
-    ![No Reservation GIF](<GIF_URL>)
+    <img src="https://github.com/Hyloft/opentable-clone/assets/72349457/91ae5718-661a-48d1-9c87-1f061cc0de72" width="450" />
+   
